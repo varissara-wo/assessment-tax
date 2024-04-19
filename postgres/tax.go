@@ -49,7 +49,7 @@ func calculateNetIncome(income float64) float64 {
 }
 
 func (p *Postgres) TaxCalculation(td tax.TaxDetails) (tax.Tax, error) {
-	taxAmount := calculateTax(calculateNetIncome(td.TotalIncome))
+	taxAmount := calculateTax(calculateNetIncome(td.TotalIncome)) - td.Wht
 
 	return tax.Tax{Tax: fmt.Sprintf("%.1f", taxAmount)}, nil
 }
