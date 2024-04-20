@@ -18,14 +18,14 @@ type Tax struct {
 }
 
 const (
-	ErrInvalidTotalIncome = "total income must be greater than 0"
-	ErrInvalidWht         = "wht must be greater than or equal to 0 and less than total income"
-	ErrInvalidAllowance   = "allowances must be donation and k-receipt only"
-	ErrInvalidAmount      = "allowance amount must be greater than or equal to 0"
+	ErrInvalidTotalIncome     = "total income must be greater than or equals 0"
+	ErrInvalidWht             = "wht must be greater than or equal to 0 and less than total income"
+	ErrInvalidAllowance       = "allowances must be donation and k-receipt only"
+	ErrInvalidAllowanceAmount = "allowance amount must be greater than or equal to 0"
 )
 
 func (td *TaxDetails) ValidateTaxDetails() error {
-	if td.TotalIncome <= 0 {
+	if td.TotalIncome < 0 {
 		return errors.New(ErrInvalidTotalIncome)
 	}
 
@@ -39,7 +39,7 @@ func (td *TaxDetails) ValidateTaxDetails() error {
 		}
 
 		if a.Amount < 0 {
-			return errors.New(ErrInvalidAmount)
+			return errors.New(ErrInvalidAllowanceAmount)
 		}
 	}
 

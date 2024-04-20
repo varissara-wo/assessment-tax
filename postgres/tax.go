@@ -7,36 +7,34 @@ import (
 	"github.com/varissara-wo/assessment-tax/tax"
 )
 
-const (
-	MAX_INCOME_1 = 150000.0
-	TAX_RATE_1   = 0.0
+type TaxBracket struct {
+	MaxIncome float64
+	TaxRate   float64
+	MaxTax    float64
+}
 
-	MAX_INCOME_2 = 500000.0
-	TAX_RATE_2   = 0.1
-	MAX_TAX_2    = 35000.0
-
-	MAX_INCOME_3 = 1000000.0
-	TAX_RATE_3   = 0.15
-	MAX_TAX_3    = 110000.0
-
-	MAX_INCOME_4 = 2000000.0
-	TAX_RATE_4   = 0.2
-	MAX_TAX_4    = 310000.0
-
-	TAX_RATE_5 = 0.35
-)
+var taxBrackets = []TaxBracket{
+	{MaxIncome: 150000.0, TaxRate: 0.0, MaxTax: 0.0},
+	{MaxIncome: 500000.0, TaxRate: 0.1, MaxTax: 35000.0},
+	{MaxIncome: 1000000.0, TaxRate: 0.15, MaxTax: 110000.0},
+	{MaxIncome: 2000000.0, TaxRate: 0.2, MaxTax: 310000.0},
+	{MaxIncome: math.MaxFloat64, TaxRate: 0.35},
+}
 
 func calculateTax(income float64) float64 {
-	if income <= MAX_INCOME_1 {
-		return income * TAX_RATE_1
-	} else if income > MAX_INCOME_1 && income <= MAX_INCOME_2 {
-		return math.Round((income - MAX_INCOME_1) * TAX_RATE_2)
-	} else if income > MAX_INCOME_2 && income <= MAX_INCOME_3 {
-		return math.Round(MAX_TAX_2 + (income-MAX_INCOME_2)*TAX_RATE_3)
-	} else if income > MAX_INCOME_3 && income <= MAX_INCOME_4 {
-		return math.Round(MAX_TAX_3 + (income-MAX_INCOME_3)*TAX_RATE_4)
+	var tax float64
+	var previousMaxTax float64
+	var previousMaxIncome float64
+
+	for _, bracket := range taxBrackets {
+		if income <= bracket.MaxIncome {
+			tax = ((income - previousMaxIncome) * bracket.TaxRate) + previousMaxTax
+			break
+		}
+		previousMaxTax = bracket.MaxTax
+		previousMaxIncome = bracket.MaxIncome
 	}
-	return math.Round(MAX_TAX_4 + (income-MAX_INCOME_4)*TAX_RATE_5)
+	return math.Round(tax)
 }
 
 func calculateAllowances(allowances []tax.Allowance) float64 {
@@ -67,7 +65,7 @@ func (p *Postgres) TaxCalculation(td tax.TaxDetails) (tax.Tax, error) {
 		return tax.Tax{Tax: fmt.Sprintf("%.1f", 0.0)}, nil
 	}
 
-	taxAmount := calculateTax(calculateNetIncome(td))
+	taxAmount := calculateTax(netIncome)
 
 	return tax.Tax{Tax: fmt.Sprintf("%.1f", taxAmount)}, nil
 }
