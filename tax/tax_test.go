@@ -1,8 +1,14 @@
 package tax
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
+	"net/http"
+	"net/http/httptest"
 	"testing"
+
+	"github.com/labstack/echo/v4"
 )
 
 func TestValidateTaxDetails(t *testing.T) {
@@ -116,170 +122,137 @@ func TestValidateTaxDetails(t *testing.T) {
 
 }
 
-type stubTax struct {
+type stub struct {
 	TaxDetails TaxDetails
 	Tax        Tax
 	err        error
 }
 
-func (s *stubTax) TaxCalculation(td TaxDetails) (Tax, error) {
+func (s *stub) TaxCalculation(td TaxDetails) (Tax, error) {
 	return s.Tax, s.err
 }
 
-// func TestTaxHandler(t *testing.T) {
-// 	t.Run("should return 400 and an error if total income less than or equals 0", func(t *testing.T) {
-// 		mockTaxDetails := TaxDetails{
-// 			TotalIncome: -1.0,
-// 			Wht:         0.0,
-// 			Allowances: []Allowance{
-// 				{
-// 					AllowanceType: "donation",
-// 					Amount:        0.0,
-// 				},
-// 			},
-// 		}
+func TestTaxHandler(t *testing.T) {
+	t.Run("should return 400 and an error if provide bad request payload", func(t *testing.T) {
 
-// 		mockTaxDetailsJSON, _ := json.Marshal(mockTaxDetails)
+		mockTaxDetails := TaxDetails{
+			TotalIncome: -1.0,
+			Wht:         0.0,
+			Allowances: []Allowance{
+				{
+					AllowanceType: "donation",
+					Amount:        0.0,
+				},
+			},
+		}
 
-// 		e := echo.New()
-// 		req := httptest.NewRequest(http.MethodPost, "/tax/calculations", bytes.NewBuffer(mockTaxDetailsJSON))
-// 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-// 		rec := httptest.NewRecorder()
-// 		c := e.NewContext(req, rec)
+		mockTaxDetailsJSON, _ := json.Marshal(mockTaxDetails)
 
-// 		st := stubTax{
-// 			TaxDetails: mockTaxDetails,
-// 			err:        errors.New(ErrInvalidTotalIncome),
-// 		}
-// 		p := New(&st)
-// 		err := p.TaxHandler(c)
+		e := echo.New()
+		req := httptest.NewRequest(http.MethodPost, "/tax/calculations", bytes.NewBuffer(mockTaxDetailsJSON))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
 
-// 		if err != nil {
-// 			t.Errorf("got some error %v", err)
-// 		}
+		st := stub{}
 
-// 		var gotErr Err
-// 		json.Unmarshal(rec.Body.Bytes(), &gotErr)
+		p := New(&st)
+		err := p.TaxHandler(c)
 
-// 		if gotErr.Message != st.err.Error() {
-// 			t.Errorf("expected error message %v but got %v", st.err, err)
-// 		}
+		if err != nil {
+			t.Errorf("expected error message but got %v", err)
+		}
 
-// 		if rec.Code != http.StatusBadRequest {
-// 			t.Errorf("expected status code %v but got %v", http.StatusBadRequest, rec.Code)
-// 		}
+		var gotErr Err
+		json.Unmarshal(rec.Body.Bytes(), &gotErr)
 
-// 	})
+		if gotErr.Message != ErrInvalidTotalIncome {
+			t.Errorf("expected error message %v but got %v", ErrInvalidTotalIncome, gotErr.Message)
+		}
 
-// 	t.Run("should return 500 and an error message if the tax calculation fails", func(t *testing.T) {
-// 		e := echo.New()
-// 		req := httptest.NewRequest(http.MethodPost, "/tax/calculations", bytes.NewBufferString(`{"totalIncome": 5000}`))
-// 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-// 		rec := httptest.NewRecorder()
-// 		c := e.NewContext(req, rec)
+		if rec.Code != http.StatusBadRequest {
+			t.Errorf("expected status code %v but got %v", http.StatusBadRequest, rec.Code)
+		}
+	})
 
-// 		st := stubTax{err: errors.New("tax calculation fails")}
-// 		p := New(&st)
-// 		err := p.TaxHandler(c)
+	t.Run("should return 500 and an error message if the tax calculation fails", func(t *testing.T) {
+		mockTaxDetails := TaxDetails{
+			TotalIncome: 10000.0,
+			Wht:         0.0,
+			Allowances: []Allowance{
+				{
+					AllowanceType: "donation",
+					Amount:        0.0,
+				},
+			},
+		}
 
-// 		if err != nil {
-// 			t.Errorf("got some error %v", err)
-// 		}
+		mockTaxDetailsJSON, _ := json.Marshal(mockTaxDetails)
 
-// 		var gotErr Err
-// 		json.Unmarshal(rec.Body.Bytes(), &gotErr)
+		e := echo.New()
+		req := httptest.NewRequest(http.MethodPost, "/tax/calculations", bytes.NewBuffer(mockTaxDetailsJSON))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
 
-// 		if gotErr.Message != st.err.Error() {
-// 			t.Errorf("expected error message %v but got %v", st.err, err)
-// 		}
+		st := stub{err: errors.New("tax calculation fails")}
+		p := New(&st)
+		err := p.TaxHandler(c)
 
-// 		if rec.Code != http.StatusInternalServerError {
-// 			t.Errorf("expected status code %v but got %v", http.StatusInternalServerError, rec.Code)
-// 		}
-// 	})
+		if err != nil {
+			t.Errorf("got some error %v", err)
+		}
 
-// 	t.Run("should return 400 and an error if WHT less than 0 or less than total income", func(t *testing.T) {
-// 		mockTaxDetails := TaxDetails{
-// 			TotalIncome: 500000.0,
-// 			Wht:         500001.0,
-// 			Allowances: []Allowance{
-// 				{
-// 					AllowanceType: "donation",
-// 					Amount:        0.0,
-// 				},
-// 			},
-// 		}
+		var gotErr Err
+		json.Unmarshal(rec.Body.Bytes(), &gotErr)
 
-// 		mockTaxDetailsJSON, _ := json.Marshal(mockTaxDetails)
+		if gotErr.Message != st.err.Error() {
+			t.Errorf("expected error message %v but got %v", st.err, err)
+		}
 
-// 		e := echo.New()
-// 		req := httptest.NewRequest(http.MethodPost, "/tax/calculations", bytes.NewBuffer(mockTaxDetailsJSON))
-// 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-// 		rec := httptest.NewRecorder()
-// 		c := e.NewContext(req, rec)
+		if rec.Code != http.StatusInternalServerError {
+			t.Errorf("expected status code %v but got %v", http.StatusInternalServerError, rec.Code)
+		}
+	})
 
-// 		st := stubTax{
-// 			TaxDetails: mockTaxDetails,
-// 			err:        errors.New(ErrInvalidWht),
-// 		}
-// 		p := New(&st)
-// 		err := p.TaxHandler(c)
+	t.Run("should return 200 and a tax of 29000.0 if the income is 500000.0", func(t *testing.T) {
+		mockTaxDetails := TaxDetails{
+			TotalIncome: 500000.0,
+			Wht:         0.0,
+			Allowances: []Allowance{
+				{
+					AllowanceType: "donation",
+					Amount:        0.0,
+				},
+			},
+		}
 
-// 		if err != nil {
-// 			t.Errorf("got some error %v", err)
-// 		}
+		e := echo.New()
+		mockTaxDetailsJSON, _ := json.Marshal(mockTaxDetails)
+		req := httptest.NewRequest(http.MethodPost, "/tax/calculations", bytes.NewBuffer(mockTaxDetailsJSON))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
 
-// 		var gotErr Err
-// 		json.Unmarshal(rec.Body.Bytes(), &gotErr)
+		want := Tax{Tax: "29000.0"}
 
-// 		if gotErr.Message != st.err.Error() {
-// 			t.Errorf("expected error message %v but got %v", st.err, err)
-// 		}
+		st := stub{
+			TaxDetails: mockTaxDetails,
+			Tax:        want,
+		}
 
-// 		if rec.Code != http.StatusBadRequest {
-// 			t.Errorf("expected status code %v but got %v", http.StatusBadRequest, rec.Code)
-// 		}
-// 	})
+		p := New(&st)
+		err := p.TaxHandler(c)
 
-// 	t.Run("should return a tax of 29000.0 if the income is 500000.0", func(t *testing.T) {
-// 		mockTaxDetails := TaxDetails{
-// 			TotalIncome: 500000.0,
-// 			Wht:         0.0,
-// 			Allowances: []Allowance{
-// 				{
-// 					AllowanceType: "donation",
-// 					Amount:        0.0,
-// 				},
-// 			},
-// 		}
+		if err != nil {
+			t.Errorf("got some error %v", err)
+		}
 
-// 		e := echo.New()
-// 		mockTaxDetailsJSON, _ := json.Marshal(mockTaxDetails)
-// 		req := httptest.NewRequest(http.MethodPost, "/tax/calculations", bytes.NewBuffer(mockTaxDetailsJSON))
-// 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-// 		rec := httptest.NewRecorder()
-// 		c := e.NewContext(req, rec)
+		var got Tax
+		json.Unmarshal(rec.Body.Bytes(), &got)
 
-// 		want := Tax{Tax: "29000.0"}
-
-// 		st := stubTax{
-// 			TaxDetails: mockTaxDetails,
-// 			Tax:        want,
-// 		}
-
-// 		p := New(&st)
-// 		err := p.TaxHandler(c)
-
-// 		if err != nil {
-// 			t.Errorf("got some error %v", err)
-// 		}
-
-// 		var got Tax
-// 		json.Unmarshal(rec.Body.Bytes(), &got)
-
-// 		if got != want {
-// 			t.Errorf("got %v want %v", got, want)
-// 		}
-// 	})
-
-// }
+		if got != want {
+			t.Errorf("got %v want %v", got, want)
+		}
+	})
+}
