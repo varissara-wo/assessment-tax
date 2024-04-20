@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 
 	"github.com/labstack/echo/v4"
@@ -13,11 +14,11 @@ import (
 
 type stub struct {
 	TaxDetails TaxDetails
-	Tax        Tax
+	Tax        TaxCalculationResponse
 	err        error
 }
 
-func (s *stub) TaxCalculation(td TaxDetails) (Tax, error) {
+func (s *stub) TaxCalculation(td TaxDetails) (TaxCalculationResponse, error) {
 	return s.Tax, s.err
 }
 
@@ -123,7 +124,7 @@ func TestTaxHandler(t *testing.T) {
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
 
-		want := Tax{Tax: "29000.0"}
+		want := TaxCalculationResponse{Tax: "29000.0", TaxLevel: []TaxBreakdown{}}
 
 		st := stub{
 			TaxDetails: mockTaxDetails,
@@ -137,10 +138,10 @@ func TestTaxHandler(t *testing.T) {
 			t.Errorf("got some error %v", err)
 		}
 
-		var got Tax
+		var got TaxCalculationResponse
 		json.Unmarshal(rec.Body.Bytes(), &got)
 
-		if got != want {
+		if got.Tax != want.Tax || !reflect.DeepEqual(got.TaxLevel, want.TaxLevel) {
 			t.Errorf("got %v want %v", got, want)
 		}
 	})

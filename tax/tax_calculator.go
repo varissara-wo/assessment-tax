@@ -1,6 +1,8 @@
 package tax
 
-import "math"
+import (
+	"math"
+)
 
 type TaxBracket struct {
 	MaxIncome float64
@@ -32,22 +34,47 @@ func CalculateTax(income float64) float64 {
 	return math.Round(tax)
 }
 
-func calculateAllowances(allowances []Allowance) float64 {
-	personal := 60000.0
-	donation := 0.0
-	kreceip := 0.0
+type AllowanceAmount struct {
+	Donation float64
+	KReceipt float64
+	Personal float64
+}
+
+type MaxAllowance struct {
+	Donation float64
+	KReceipt float64
+	Personal float64
+}
+
+func calculateAllowances(allowances []Allowance, ma MaxAllowance) float64 {
+	aa := AllowanceAmount{
+		Donation: 0.0,
+		KReceipt: 0.0,
+		Personal: 0.0,
+	}
+
+	aa.Personal = ma.Personal
 
 	for _, a := range allowances {
-		if a.AllowanceType == "donation" {
-			donation += a.Amount
-		} else if a.AllowanceType == "k-receipt" {
-			kreceip += a.Amount
+		switch a.AllowanceType {
+		case Donation:
+			if aa.Donation+a.Amount <= ma.Donation {
+				aa.Donation += a.Amount
+			} else {
+				aa.Donation = ma.Donation
+			}
+		case KReceipt:
+			if aa.KReceipt+a.Amount <= ma.KReceipt {
+				aa.KReceipt += a.Amount
+			} else {
+				aa.KReceipt = ma.KReceipt
+			}
 		}
 	}
 
-	return personal + donation + kreceip
+	return aa.Donation + aa.KReceipt + aa.Personal
 }
 
-func (td TaxDetails) CalculateNetIncome() float64 {
-	return td.TotalIncome - calculateAllowances(td.Allowances) - td.Wht
+func (td TaxDetails) CalculateNetIncome(ma MaxAllowance) float64 {
+	return td.TotalIncome - calculateAllowances(td.Allowances, ma) - td.Wht
 }

@@ -14,6 +14,7 @@ type Postgres struct {
 
 func New() (*Postgres, error) {
 	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
+
 	if err != nil {
 		log.Fatal(err)
 		return nil, err

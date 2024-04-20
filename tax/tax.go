@@ -3,11 +3,11 @@ package tax
 type AllowanceType string
 
 const (
-	Donation  AllowanceType = "donation"
-	KReceiptt AllowanceType = "k-receiptt"
+	Donation AllowanceType = "donation"
+	KReceipt AllowanceType = "k-receipt"
 )
 
-var validAllowanceTypes = []AllowanceType{Donation, KReceiptt}
+var validAllowanceTypes = []AllowanceType{Donation, KReceipt}
 
 type Allowance struct {
 	AllowanceType AllowanceType
@@ -20,8 +20,14 @@ type TaxDetails struct {
 	Allowances  []Allowance
 }
 
-type Tax struct {
-	Tax string `json:"tax"`
+type TaxBreakdown struct {
+	Level string  `json:"level"`
+	Tax   float64 `json:"tax"`
+}
+
+type TaxCalculationResponse struct {
+	Tax      string         `json:"tax"`
+	TaxLevel []TaxBreakdown `json:"taxLevel"`
 }
 
 const (

@@ -35,22 +35,28 @@ func TestTaxCalculation(t *testing.T) {
 	}
 }
 
+var mockMaxAllowance = MaxAllowance{
+	Donation: 100000.0,
+	KReceipt: 50000.0,
+	Personal: 60000.0,
+}
+
 func TestAllowancesCalculation(t *testing.T) {
 	t.Run("should return 60000", func(t *testing.T) {
-		want := 360000.0
+		want := 180000.0
 
 		mockAllowances := []Allowance{
 			{
 				AllowanceType: "k-receipt",
-				Amount:        200000.0,
+				Amount:        20000.0,
 			},
 			{
 				AllowanceType: "donation",
-				Amount:        100000.0,
+				Amount:        105000.0,
 			},
 		}
 
-		got := calculateAllowances(mockAllowances)
+		got := calculateAllowances(mockAllowances, mockMaxAllowance)
 
 		if got != want {
 			t.Errorf("got %v want %v", got, want)
@@ -60,7 +66,7 @@ func TestAllowancesCalculation(t *testing.T) {
 
 func TestNetIncomeCalculation(t *testing.T) {
 	t.Run("should return 60000", func(t *testing.T) {
-		want := 638000.0
+		want := 788000.0
 
 		mockTaxDetails := TaxDetails{
 			TotalIncome: 1000000.0,
@@ -77,7 +83,7 @@ func TestNetIncomeCalculation(t *testing.T) {
 			},
 		}
 
-		got := mockTaxDetails.CalculateNetIncome()
+		got := mockTaxDetails.CalculateNetIncome(mockMaxAllowance)
 
 		if got != want {
 			t.Errorf("got %v want %v", got, want)
