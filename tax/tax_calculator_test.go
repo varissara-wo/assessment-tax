@@ -2,35 +2,54 @@ package tax
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 )
+
+func generateTaxBreakdown(taxValues ...float64) []TaxBreakdown {
+	var breakdown []TaxBreakdown
+	for i, tax := range taxValues {
+		breakdown = append(breakdown, TaxBreakdown{
+			Level: taxBrackets[i].Description,
+			Tax:   tax,
+		})
+	}
+	return breakdown
+}
 
 func TestTaxCalculation(t *testing.T) {
 
 	tests := []struct {
-		income float64
-		tax    float64
+		income   float64
+		tax      float64
+		taxLevel []TaxBreakdown
 	}{
-		{0.0, 0.0},
-		{150000.0, 0.0},
-		{150001.0, 0.0},
-		{500000.0, 35000.0},
-		{500001.0, 35000.0},
-		{1000000.0, 110000.0},
-		{1000001.0, 110000.0},
-		{2000000.0, 310000.0},
-		{3000000.0, 660000.0},
+		{0.0, 0.0, generateTaxBreakdown(0.0, 0.0, 0.0, 0.0, 0.0)},
+		{150000.0, 0.0, generateTaxBreakdown(0.0, 0.0, 0.0, 0.0, 0.0)},
+		{150001.0, 0.0, generateTaxBreakdown(0.0, 0.0, 0.0, 0.0, 0.0)},
+		{500000.0, 35000.0, generateTaxBreakdown(0.0, 35000.0, 0.0, 0.0, 0.0)},
+		{500001.0, 35000.0, generateTaxBreakdown(0.0, 0.0, 35000.0, 0.0, 0.0)},
+		{1000000.0, 110000.0, generateTaxBreakdown(0.0, 0.0, 110000.0, 0.0, 0.0)},
+		{1000001.0, 110000.0, generateTaxBreakdown(0.0, 0.0, 0.0, 110000.0, 0.0)},
+		{2000000.0, 310000.0, generateTaxBreakdown(0.0, 0.0, 0.0, 310000.0, 0.0)},
+		{3000000.0, 660000.0, generateTaxBreakdown(0.0, 0.0, 0.0, 0.0, 660000.0)},
 	}
 
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("final income %v should return %v", tt.income, tt.tax), func(t *testing.T) {
 			want := tt.tax
+			wantTaxLevel := tt.taxLevel
 
 			got := CalculateTax(tt.income)
 
-			if got != want {
-				t.Errorf("got %v want %v", got, want)
+			if got.Tax != want {
+				t.Errorf("got %v want %v", got.Tax, want)
 			}
+
+			if !reflect.DeepEqual(got.TaxLevel, wantTaxLevel) {
+				t.Errorf("got tax level %v want %v", got.TaxLevel, wantTaxLevel)
+			}
+
 		})
 	}
 }

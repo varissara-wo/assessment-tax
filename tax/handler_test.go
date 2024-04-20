@@ -124,7 +124,7 @@ func TestTaxHandler(t *testing.T) {
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
 
-		want := TaxCalculationResponse{Tax: "29000.0", TaxLevel: []TaxBreakdown{}}
+		want := TaxCalculationResponse{Tax: 29000.0, TaxLevel: []TaxBreakdown{}}
 
 		st := stub{
 			TaxDetails: mockTaxDetails,

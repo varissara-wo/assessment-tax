@@ -27,7 +27,7 @@ type TaxBreakdown struct {
 }
 
 type TaxCalculationResponse struct {
-	Tax      string         `json:"tax"`
+	Tax      float64        `json:"tax"`
 	TaxLevel []TaxBreakdown `json:"taxLevel"`
 }
 
