@@ -39,17 +39,35 @@ func calculateTax(income float64) float64 {
 	return math.Round(MAX_TAX_4 + (income-MAX_INCOME_4)*TAX_RATE_5)
 }
 
-func calculateAllowances() float64 {
+func calculateAllowances(allowances []tax.Allowance) float64 {
 	personal := 60000.0
-	return personal
+	donation := 0.0
+	kreceip := 0.0
+
+	for _, a := range allowances {
+		if a.AllowanceType == "donation" {
+			donation += a.Amount
+		} else if a.AllowanceType == "k-receipt" {
+			kreceip += a.Amount
+		}
+	}
+
+	return personal + donation + kreceip
 }
 
-func calculateNetIncome(income float64) float64 {
-	return income - calculateAllowances()
+func calculateNetIncome(td tax.TaxDetails) float64 {
+	return td.TotalIncome - calculateAllowances(td.Allowances) - td.Wht
 }
 
 func (p *Postgres) TaxCalculation(td tax.TaxDetails) (tax.Tax, error) {
-	taxAmount := calculateTax(calculateNetIncome(td.TotalIncome)) - td.Wht
+
+	netIncome := calculateNetIncome(td)
+
+	if netIncome <= 0 {
+		return tax.Tax{Tax: fmt.Sprintf("%.1f", 0.0)}, nil
+	}
+
+	taxAmount := calculateTax(calculateNetIncome(td))
 
 	return tax.Tax{Tax: fmt.Sprintf("%.1f", taxAmount)}, nil
 }

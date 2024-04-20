@@ -44,7 +44,7 @@ func TestTaxHandler(t *testing.T) {
 
 		st := stubTax{
 			TaxDetails: mockTaxDetails,
-			err:        errors.New("Total income must be greater than 0"),
+			err:        errors.New(ErrInvalidTotalIncome),
 		}
 		p := New(&st)
 		err := p.TaxHandler(c)
@@ -115,7 +115,7 @@ func TestTaxHandler(t *testing.T) {
 
 		st := stubTax{
 			TaxDetails: mockTaxDetails,
-			err:        errors.New("WHT must be greater than or equal to 0 and less than total income"),
+			err:        errors.New(ErrInvalidWht),
 		}
 		p := New(&st)
 		err := p.TaxHandler(c)

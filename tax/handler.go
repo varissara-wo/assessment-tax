@@ -29,12 +29,8 @@ func (h *Handler) TaxHandler(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, Err{Message: err.Error()})
 	}
 
-	if td.TotalIncome <= 0 {
-		return c.JSON(http.StatusBadRequest, Err{Message: "Total income must be greater than 0"})
-	}
-
-	if td.Wht < 0 || td.Wht > td.TotalIncome {
-		return c.JSON(http.StatusBadRequest, Err{Message: "WHT must be greater than or equal to 0 and less than total income"})
+	if err := td.ValidateTaxDetails(); err != nil {
+		return c.JSON(http.StatusBadRequest, Err{Message: err.Error()})
 	}
 
 	t, err := h.store.TaxCalculation(td)
