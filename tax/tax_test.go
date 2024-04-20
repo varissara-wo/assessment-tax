@@ -1,6 +1,9 @@
 package tax
 
-import "testing"
+import (
+	"errors"
+	"testing"
+)
 
 func TestValidateTaxDetails(t *testing.T) {
 
@@ -23,132 +26,105 @@ func TestValidateTaxDetails(t *testing.T) {
 		}
 	})
 
-	t.Run("should return an error if total income is less than 0", func(t *testing.T) {
-		mockTaxDetails := TaxDetails{
-			TotalIncome: -1.0,
-			Wht:         0.0,
-			Allowances: []Allowance{
-				{
-					AllowanceType: "donation",
-					Amount:        0.0,
+	testCases := []struct {
+		name          string
+		taxDetails    TaxDetails
+		expectedError error
+	}{
+
+		{
+			name: "should return an error if total income is less than 0",
+			taxDetails: TaxDetails{
+				TotalIncome: -1.0,
+				Wht:         0.0,
+				Allowances: []Allowance{
+					{
+						AllowanceType: "donation",
+						Amount:        0.0,
+					},
 				},
 			},
-		}
-
-		err := mockTaxDetails.ValidateTaxDetails()
-
-		if err == nil {
-			t.Errorf("expected an error but got nil")
-		}
-
-		if err.Error() != ErrInvalidTotalIncome {
-			t.Errorf("expected error message %v but got %v", ErrInvalidTotalIncome, err.Error())
-		}
-	})
-
-	t.Run("should return an error if WHT is less than 0", func(t *testing.T) {
-		mockTaxDetails := TaxDetails{
-			TotalIncome: 500000.0,
-			Wht:         -1.0,
-			Allowances: []Allowance{
-				{
-					AllowanceType: "donation",
-					Amount:        0.0,
+			expectedError: errors.New(ErrInvalidTotalIncome),
+		},
+		{
+			name: "should return an error if WHT is less than 0",
+			taxDetails: TaxDetails{
+				TotalIncome: 500000.0,
+				Wht:         -1.0,
+				Allowances: []Allowance{
+					{
+						AllowanceType: "donation",
+						Amount:        0.0,
+					},
 				},
 			},
-		}
-
-		err := mockTaxDetails.ValidateTaxDetails()
-
-		if err == nil {
-			t.Errorf("expected an error but got nil")
-		}
-
-		if err.Error() != ErrInvalidWHT {
-			t.Errorf("expected error message %v but got %v", ErrInvalidWHT, err.Error())
-		}
-	})
-
-	t.Run("should return an error if WHT is greater than total income", func(t *testing.T) {
-		mockTaxDetails := TaxDetails{
-			TotalIncome: 500000.0,
-			Wht:         500001.0,
-			Allowances: []Allowance{
-				{
-					AllowanceType: "donation",
-					Amount:        0.0,
+			expectedError: errors.New(ErrInvalidWHT),
+		},
+		{
+			name: "should return an error if WHT is greater than total income",
+			taxDetails: TaxDetails{
+				TotalIncome: 500000.0,
+				Wht:         500001.0,
+				Allowances: []Allowance{
+					{
+						AllowanceType: "donation",
+						Amount:        0.0,
+					},
 				},
 			},
-		}
-
-		err := mockTaxDetails.ValidateTaxDetails()
-
-		if err == nil {
-			t.Errorf("expected an error but got nil")
-		}
-
-		if err.Error() != ErrInvalidWHT {
-			t.Errorf("expected error message %v but got %v", ErrInvalidWHT, err.Error())
-		}
-	})
-
-	t.Run("should return an error if allowance type is not donation or k-receipt", func(t *testing.T) {
-		mockTaxDetails := TaxDetails{
-			TotalIncome: 500000.0,
-			Wht:         0.0,
-			Allowances: []Allowance{
-				{
-					AllowanceType: "invalid",
-					Amount:        0.0,
+			expectedError: errors.New(ErrInvalidWHT),
+		},
+		{
+			name: "should return an error if allowance type is not donation or k-receipt",
+			taxDetails: TaxDetails{
+				TotalIncome: 500000.0,
+				Wht:         0.0,
+				Allowances: []Allowance{
+					{
+						AllowanceType: "invalid",
+						Amount:        0.0,
+					},
 				},
 			},
-		}
-
-		err := mockTaxDetails.ValidateTaxDetails()
-
-		if err == nil {
-			t.Errorf("expected an error but got nil")
-		}
-
-		if err.Error() != ErrInvalidAllowance {
-			t.Errorf("expected error message %v but got %v", ErrInvalidAllowance, err.Error())
-		}
-	})
-
-	t.Run("should return an error if allowance amount is less than 0", func(t *testing.T) {
-		mockTaxDetails := TaxDetails{
-			TotalIncome: 500000.0,
-			Wht:         0.0,
-			Allowances: []Allowance{
-				{
-					AllowanceType: "donation",
-					Amount:        -1.0,
+			expectedError: errors.New(ErrInvalidAllowance),
+		},
+		{
+			name: "should return an error if allowance amount is less than 0",
+			taxDetails: TaxDetails{
+				TotalIncome: 500000.0,
+				Wht:         0.0,
+				Allowances: []Allowance{
+					{
+						AllowanceType: "donation",
+						Amount:        -1.0,
+					},
 				},
 			},
-		}
+			expectedError: errors.New(ErrInvalidAllowanceAmount),
+		},
+	}
 
-		err := mockTaxDetails.ValidateTaxDetails()
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			err := tc.taxDetails.ValidateTaxDetails()
 
-		if err == nil {
-			t.Errorf("expected an error but got nil")
-		}
-
-		if err.Error() != ErrInvalidAllowanceAmount {
-			t.Errorf("expected error message %v but got %v", ErrInvalidAllowanceAmount, err.Error())
-		}
-	})
+			if err.Error() != tc.expectedError.Error() {
+				t.Errorf("expected error %v but got %v", tc.expectedError, err)
+			}
+		})
+	}
 
 }
 
-// type stubTax struct {
-// 	TaxDetails TaxDetails
-// 	Tax        Tax
-// 	err        error
-// }
+type stubTax struct {
+	TaxDetails TaxDetails
+	Tax        Tax
+	err        error
+}
 
-// func (s *stubTax) TaxCalculation(td TaxDetails) (Tax, error) {
-// 	return s.Tax, s.err
-// }
+func (s *stubTax) TaxCalculation(td TaxDetails) (Tax, error) {
+	return s.Tax, s.err
+}
 
 // func TestTaxHandler(t *testing.T) {
 // 	t.Run("should return 400 and an error if total income less than or equals 0", func(t *testing.T) {
