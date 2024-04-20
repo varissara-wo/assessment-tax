@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"database/sql"
-	"fmt"
 
 	"github.com/varissara-wo/assessment-tax/tax"
 )
@@ -26,6 +25,7 @@ func (p *Postgres) TaxCalculation(td tax.TaxDetails) (tax.TaxCalculationResponse
 		var amount float64
 		var id int
 		err := rows.Scan(&id, &t, &amount)
+
 		if err != nil {
 			return tax.TaxCalculationResponse{}, err
 		}
@@ -43,10 +43,8 @@ func (p *Postgres) TaxCalculation(td tax.TaxDetails) (tax.TaxCalculationResponse
 	netIncome := td.CalculateNetIncome(ma)
 
 	if netIncome <= 0 {
-		return tax.TaxCalculationResponse{Tax: fmt.Sprintf("%.1f", 0.0)}, nil
+		return tax.TaxCalculationResponse{Tax: 0.0}, nil
 	}
 
-	taxAmount := tax.CalculateTax(netIncome)
-
-	return tax.TaxCalculationResponse{Tax: fmt.Sprintf("%.1f", taxAmount), TaxLevel: []tax.TaxBreakdown{}}, nil
+	return tax.CalculateTax(netIncome), nil
 }

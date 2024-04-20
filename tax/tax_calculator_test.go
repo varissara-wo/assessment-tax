@@ -28,8 +28,8 @@ func TestTaxCalculation(t *testing.T) {
 
 			got := CalculateTax(tt.income)
 
-			if got != want {
-				t.Errorf("got %v want %v", got, want)
+			if got.Tax != want {
+				t.Errorf("got %v want %v", got.Tax, want)
 			}
 		})
 	}

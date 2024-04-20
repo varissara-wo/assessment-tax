@@ -5,6 +5,6 @@ CREATE TABLE IF NOT EXISTS allowances (
 );
 
 INSERT INTO allowances (type, max_amount) VALUES
-('Personal', 60000.0),
-('Donation', 100000.0),
-('KReceipt', 50000.0);
+('personal', 60000.0),
+('donation', 100000.0),
+('k-receipt', 50000.0);
