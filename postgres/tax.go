@@ -22,7 +22,7 @@ func (p *Postgres) TaxCalculation(td tax.TaxDetails) (tax.TaxCalculationResponse
 	var ma tax.MaxAllowance
 
 	for rows.Next() {
-		var t string
+		var t tax.AllowanceType
 		var amount float64
 		var id int
 		err := rows.Scan(&id, &t, &amount)
@@ -31,11 +31,11 @@ func (p *Postgres) TaxCalculation(td tax.TaxDetails) (tax.TaxCalculationResponse
 		}
 
 		switch t {
-		case "Donation":
+		case tax.Donation:
 			ma.Donation = amount
-		case "KReceipt":
+		case tax.KReceipt:
 			ma.KReceipt = amount
-		case "Personal":
+		case tax.Personal:
 			ma.Personal = amount
 		}
 	}

@@ -5,6 +5,7 @@ type AllowanceType string
 const (
 	Donation AllowanceType = "donation"
 	KReceipt AllowanceType = "k-receipt"
+	Personal AllowanceType = "personal"
 )
 
 var validAllowanceTypes = []AllowanceType{Donation, KReceipt}
