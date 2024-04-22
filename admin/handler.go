@@ -37,6 +37,10 @@ func (h *Handler) PersonalDeductionHandler(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, Err{Message: err.Error()})
 	}
 
+	if err := a.ValidatePersonalDeduction(); err != nil {
+		return c.JSON(http.StatusBadRequest, Err{Message: err.Error()})
+	}
+
 	d, err := h.store.SetPersonalDeduction(a.Amount)
 
 	if err != nil {
