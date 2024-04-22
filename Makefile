@@ -1,5 +1,5 @@
 run:
-	PORT=8080 DATABASE_URL="host=localhost port=5432 user=postgres password=postgres dbname=ktaxes sslmode=disable" go run main.go
+	PORT=8080 DATABASE_URL="host=localhost port=5432 user=postgres password=postgres dbname=ktaxes sslmode=disable" ADMIN_USERNAME="adminTax" ADMIN_PASSWORD="admin!" go run main.go
 
 test: 
 	go test -v ./...
