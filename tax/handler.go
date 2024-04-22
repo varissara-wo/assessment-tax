@@ -67,9 +67,15 @@ func (h *Handler) TaxCSVHandler(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, Err{Message: err.Error()})
 	}
 
+	// Check header
+	if row[0] != "totalIncome" || row[1] != "wht" || row[2] != "donation" {
+		return c.JSON(http.StatusBadRequest, Err{Message: "Invalid CSV header"})
+	}
+
 	taxDetails := []TaxDetails{}
 	for {
 		row, err := reader.Read()
+
 		if err == io.EOF {
 			break
 		} else if err != nil {
@@ -77,6 +83,10 @@ func (h *Handler) TaxCSVHandler(c echo.Context) error {
 		}
 
 		td := TaxDetails{}
+
+		if row[0] == "" || row[1] == "" || row[2] == "" {
+			return c.JSON(http.StatusBadRequest, Err{Message: "Invalid CSV data value cannot be empty"})
+		}
 
 		totalIncome, err := strconv.ParseFloat(strings.Replace(row[0], ",", "", -1), 64)
 		if err != nil {
