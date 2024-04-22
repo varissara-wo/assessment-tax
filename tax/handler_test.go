@@ -27,7 +27,7 @@ func TestTaxHandler(t *testing.T) {
 
 		mockTaxDetails := TaxDetails{
 			TotalIncome: -1.0,
-			Wht:         0.0,
+			WHT:         0.0,
 			Allowances: []Allowance{
 				{
 					AllowanceType: "donation",
@@ -68,7 +68,7 @@ func TestTaxHandler(t *testing.T) {
 	t.Run("should return 500 and an error message if the tax calculation fails", func(t *testing.T) {
 		mockTaxDetails := TaxDetails{
 			TotalIncome: 10000.0,
-			Wht:         0.0,
+			WHT:         0.0,
 			Allowances: []Allowance{
 				{
 					AllowanceType: "donation",
@@ -108,7 +108,7 @@ func TestTaxHandler(t *testing.T) {
 	t.Run("should return 200 and a tax of 29000.0 if the income is 500000.0", func(t *testing.T) {
 		mockTaxDetails := TaxDetails{
 			TotalIncome: 500000.0,
-			Wht:         0.0,
+			WHT:         0.0,
 			Allowances: []Allowance{
 				{
 					AllowanceType: "donation",

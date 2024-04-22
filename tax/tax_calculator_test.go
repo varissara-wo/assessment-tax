@@ -89,7 +89,7 @@ func TestNetIncomeCalculation(t *testing.T) {
 
 		mockTaxDetails := TaxDetails{
 			TotalIncome: 1000000.0,
-			Wht:         2000.0,
+			WHT:         2000.0,
 			Allowances: []Allowance{
 				{
 					AllowanceType: "k-receipt",

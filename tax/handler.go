@@ -1,7 +1,12 @@
 package tax
 
 import (
+	"encoding/csv"
+	"io"
+	"log"
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -40,4 +45,68 @@ func (h *Handler) TaxHandler(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, t)
+}
+
+func (h *Handler) TaxCSVHandler(c echo.Context) error {
+	file, err := c.FormFile("file")
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, Err{Message: err.Error()})
+	}
+
+	src, err := file.Open()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, Err{Message: err.Error()})
+	}
+	defer src.Close()
+
+	reader := csv.NewReader(src)
+	// Read first line
+	row, err := reader.Read()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, Err{Message: err.Error()})
+	}
+
+	taxDetails := []TaxDetails{}
+	for {
+		row, err := reader.Read()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return c.JSON(http.StatusInternalServerError, Err{Message: err.Error()})
+		}
+
+		td := TaxDetails{}
+
+		totalIncome, err := strconv.ParseFloat(strings.Replace(row[0], ",", "", -1), 64)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, Err{Message: err.Error()})
+		}
+		td.TotalIncome = totalIncome
+
+		wht, err := strconv.ParseFloat(strings.Replace(row[1], ",", "", -1), 64)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, Err{Message: err.Error()})
+		}
+		td.WHT = wht
+
+		a, err := strconv.ParseFloat(strings.Replace(row[2], ",", "", -1), 64)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, Err{Message: err.Error()})
+		}
+		td.Allowances = []Allowance{{
+			AllowanceType: Donation,
+			Amount:        a,
+		}}
+
+		taxDetails = append(taxDetails, td)
+
+	}
+
+	// check
+	for _, td := range taxDetails {
+		log.Printf("Tax Detail: %+v\n", td)
+	}
+
+	return c.String(http.StatusOK, "File processed successfully")
 }

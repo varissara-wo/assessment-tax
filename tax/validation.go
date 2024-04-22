@@ -7,7 +7,7 @@ func (td *TaxDetails) ValidateTaxDetails() error {
 		return err
 	}
 
-	if err := validateWHT(td.Wht, td.TotalIncome); err != nil {
+	if err := validateWHT(td.WHT, td.TotalIncome); err != nil {
 		return err
 	}
 

@@ -94,5 +94,5 @@ func calculateAllowances(allowances []Allowance, ma MaxAllowance) float64 {
 }
 
 func (td TaxDetails) CalculateNetIncome(ma MaxAllowance) float64 {
-	return td.TotalIncome - calculateAllowances(td.Allowances, ma) - td.Wht
+	return td.TotalIncome - calculateAllowances(td.Allowances, ma) - td.WHT
 }

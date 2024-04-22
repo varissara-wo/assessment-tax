@@ -23,6 +23,7 @@ func main() {
 		return c.String(http.StatusOK, "Hello, Go Bootcamp!")
 	})
 	e.POST("/tax/calculations", th.TaxHandler)
+	e.POST("tax/calculations/upload-csv", th.TaxCSVHandler)
 
 	ah := admin.New(p)
 	a := e.Group("/admin")
