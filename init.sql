@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS allowances (
     id SERIAL PRIMARY KEY,
-    type VARCHAR(25) NOT NULL,
+    type VARCHAR(25) NOT NULL UNIQUE,
     max_amount FLOAT NOT NULL
 );
 

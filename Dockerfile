@@ -18,6 +18,8 @@ COPY --from=build-base /app/out/assessment-tax /app/assessment-tax
 
 ENV PORT=8080
 ENV DATABASE_URL="host=host.docker.internal port=5432 user=postgres password=postgres dbname=ktaxes sslmode=disable"
+ENV ADMIN_USERNAME="adminTax" 
+ENV ADMIN_PASSWORD="admin!"
 
 EXPOSE 8080
 
