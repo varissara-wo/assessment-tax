@@ -19,7 +19,7 @@ var taxBrackets = []TaxBracket{
 	{Description: "2,000,001 ขึ้นไป", MaxIncome: math.MaxFloat64, TaxRate: 0.35},
 }
 
-func CalculateTax(income float64) TaxCalculationResponse {
+func CalculateTax(income float64, wht float64) TaxCalculationResponse {
 	tax := 0.0
 	previousMaxTax := 0.0
 	previousMaxIncome := 0.0
@@ -45,7 +45,7 @@ func CalculateTax(income float64) TaxCalculationResponse {
 	}
 
 	taxCalculationResponse := TaxCalculationResponse{
-		Tax:      math.Round(tax),
+		Tax:      math.Round(tax) - wht,
 		TaxLevel: tbl,
 	}
 
@@ -94,5 +94,6 @@ func calculateAllowances(allowances []Allowance, ma MaxAllowance) float64 {
 }
 
 func (td TaxDetails) CalculateNetIncome(ma MaxAllowance) float64 {
-	return td.TotalIncome - calculateAllowances(td.Allowances, ma) - td.WHT
+	// return td.TotalIncome - calculateAllowances(td.Allowances, ma) - td.WHT
+	return td.TotalIncome - calculateAllowances(td.Allowances, ma)
 }

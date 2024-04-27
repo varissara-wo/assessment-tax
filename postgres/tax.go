@@ -46,5 +46,5 @@ func (p *Postgres) TaxCalculation(td tax.TaxDetails) (tax.TaxCalculationResponse
 		return tax.TaxCalculationResponse{Tax: 0.0}, nil
 	}
 
-	return tax.CalculateTax(netIncome), nil
+	return tax.CalculateTax(netIncome, td.WHT), nil
 }
