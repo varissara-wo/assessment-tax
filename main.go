@@ -23,6 +23,7 @@ func main() {
 		return c.String(http.StatusOK, "Hello, Go Bootcamp!")
 	})
 	e.POST("/tax/calculations", th.TaxHandler)
+	e.POST("tax/calculations/upload-csv", th.TaxCSVHandler)
 
 	ah := admin.New(p)
 	a := e.Group("/admin")
@@ -34,7 +35,7 @@ func main() {
 
 	}))
 
-	a.POST("/personal-deduction", ah.PersonalDeductionHandler)
+	a.POST("/personal-deduction", ah.SetPersonalAllowanceHandler)
 
 	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
 }

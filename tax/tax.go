@@ -17,7 +17,7 @@ type Allowance struct {
 
 type TaxDetails struct {
 	TotalIncome float64
-	Wht         float64
+	WHT         float64
 	Allowances  []Allowance
 }
 

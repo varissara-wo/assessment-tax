@@ -10,7 +10,7 @@ func TestValidateTaxDetails(t *testing.T) {
 	t.Run("should return nil if all fields are valid", func(t *testing.T) {
 		mockTaxDetails := TaxDetails{
 			TotalIncome: 500000.0,
-			Wht:         0.0,
+			WHT:         0.0,
 			Allowances: []Allowance{
 				{
 					AllowanceType: "donation",
@@ -36,7 +36,7 @@ func TestValidateTaxDetails(t *testing.T) {
 			name: "should return an error if total income is less than 0",
 			taxDetails: TaxDetails{
 				TotalIncome: -1.0,
-				Wht:         0.0,
+				WHT:         0.0,
 				Allowances: []Allowance{
 					{
 						AllowanceType: "donation",
@@ -50,7 +50,7 @@ func TestValidateTaxDetails(t *testing.T) {
 			name: "should return an error if WHT is less than 0",
 			taxDetails: TaxDetails{
 				TotalIncome: 500000.0,
-				Wht:         -1.0,
+				WHT:         -1.0,
 				Allowances: []Allowance{
 					{
 						AllowanceType: "donation",
@@ -64,7 +64,7 @@ func TestValidateTaxDetails(t *testing.T) {
 			name: "should return an error if WHT is greater than total income",
 			taxDetails: TaxDetails{
 				TotalIncome: 500000.0,
-				Wht:         500001.0,
+				WHT:         500001.0,
 				Allowances: []Allowance{
 					{
 						AllowanceType: "donation",
@@ -78,7 +78,7 @@ func TestValidateTaxDetails(t *testing.T) {
 			name: "should return an error if allowance type is not donation or k-receipt",
 			taxDetails: TaxDetails{
 				TotalIncome: 500000.0,
-				Wht:         0.0,
+				WHT:         0.0,
 				Allowances: []Allowance{
 					{
 						AllowanceType: "invalid",
@@ -92,7 +92,7 @@ func TestValidateTaxDetails(t *testing.T) {
 			name: "should return an error if allowance amount is less than 0",
 			taxDetails: TaxDetails{
 				TotalIncome: 500000.0,
-				Wht:         0.0,
+				WHT:         0.0,
 				Allowances: []Allowance{
 					{
 						AllowanceType: "donation",

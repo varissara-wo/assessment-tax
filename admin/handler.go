@@ -7,7 +7,7 @@ import (
 )
 
 type Storer interface {
-	SetPersonalDeduction(amount float64) (PersonalDeduction, error)
+	SetPersonalAllowance(amount float64) (PersonalAllowance, error)
 }
 
 type Handler struct {
@@ -26,22 +26,22 @@ type Amount struct {
 	Amount float64 `json:"amount"`
 }
 
-type PersonalDeduction struct {
+type PersonalAllowance struct {
 	PersonalDeduction float64 `json:"personalDeduction"`
 }
 
-func (h *Handler) PersonalDeductionHandler(c echo.Context) error {
+func (h *Handler) SetPersonalAllowanceHandler(c echo.Context) error {
 	a := Amount{}
 
 	if err := c.Bind(&a); err != nil {
 		return c.JSON(http.StatusBadRequest, Err{Message: err.Error()})
 	}
 
-	if err := a.ValidatePersonalDeduction(); err != nil {
+	if err := a.ValidatePersonalAllowance(); err != nil {
 		return c.JSON(http.StatusBadRequest, Err{Message: err.Error()})
 	}
 
-	d, err := h.store.SetPersonalDeduction(a.Amount)
+	d, err := h.store.SetPersonalAllowance(a.Amount)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, Err{Message: err.Error()})

@@ -10,7 +10,7 @@ func TestValidatePersoanlAmount(t *testing.T) {
 	t.Run("should return nil if amount is valid", func(t *testing.T) {
 		a := Amount{Amount: 20000.0}
 
-		got := a.ValidatePersonalDeduction()
+		got := a.ValidatePersonalAllowance()
 
 		if got != nil {
 			t.Errorf("expected nil but got %v", got)
@@ -21,7 +21,7 @@ func TestValidatePersoanlAmount(t *testing.T) {
 		a := Amount{Amount: 9999.0}
 
 		want := errors.New(ErrInvalidPersonalGreaterAmount)
-		got := a.ValidatePersonalDeduction()
+		got := a.ValidatePersonalAllowance()
 
 		if got.Error() != want.Error() {
 			t.Errorf("expected %v but got %v", want, got)
@@ -32,7 +32,7 @@ func TestValidatePersoanlAmount(t *testing.T) {
 		a := Amount{Amount: 100001.0}
 
 		want := errors.New(ErrInvalidPersonalLessAmount)
-		got := a.ValidatePersonalDeduction()
+		got := a.ValidatePersonalAllowance()
 
 		if got.Error() != want.Error() {
 			t.Errorf("expected %v but got %v", want, got)

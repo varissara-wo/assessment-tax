@@ -40,7 +40,7 @@ func TestTaxCalculation(t *testing.T) {
 			want := tt.tax
 			wantTaxLevel := tt.taxLevel
 
-			got := CalculateTax(tt.income)
+			got := CalculateTax(tt.income, 0.0)
 
 			if got.Tax != want {
 				t.Errorf("got %v want %v", got.Tax, want)
@@ -85,11 +85,11 @@ func TestAllowancesCalculation(t *testing.T) {
 
 func TestNetIncomeCalculation(t *testing.T) {
 	t.Run("should return 60000", func(t *testing.T) {
-		want := 788000.0
+		want := 790000.0
 
 		mockTaxDetails := TaxDetails{
 			TotalIncome: 1000000.0,
-			Wht:         2000.0,
+			WHT:         2000.0,
 			Allowances: []Allowance{
 				{
 					AllowanceType: "k-receipt",
