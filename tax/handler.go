@@ -2,11 +2,7 @@ package tax
 
 import (
 	"encoding/csv"
-	"io"
-	"log"
 	"net/http"
-	"strconv"
-	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -70,56 +66,9 @@ func (h *Handler) TaxCSVHandler(c echo.Context) error {
 	defer src.Close()
 
 	reader := csv.NewReader(src)
-	// Read first line
-	row, err := reader.Read()
+	taxDetails, err := readCSV(reader)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, Err{Message: err.Error()})
-	}
-
-	// Check header
-	if row[0] != "totalIncome" || row[1] != "wht" || row[2] != "donation" {
-		return c.JSON(http.StatusBadRequest, Err{Message: "Invalid CSV header"})
-	}
-
-	taxDetails := []TaxDetails{}
-	for {
-		row, err := reader.Read()
-
-		if err == io.EOF {
-			break
-		} else if err != nil {
-			return c.JSON(http.StatusInternalServerError, Err{Message: err.Error()})
-		}
-
-		td := TaxDetails{}
-
-		if row[0] == "" || row[1] == "" || row[2] == "" {
-			return c.JSON(http.StatusBadRequest, Err{Message: "Invalid CSV data value cannot be empty"})
-		}
-
-		totalIncome, err := strconv.ParseFloat(strings.Replace(row[0], ",", "", -1), 64)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, Err{Message: err.Error()})
-		}
-		td.TotalIncome = totalIncome
-
-		wht, err := strconv.ParseFloat(strings.Replace(row[1], ",", "", -1), 64)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, Err{Message: err.Error()})
-		}
-		td.WHT = wht
-
-		a, err := strconv.ParseFloat(strings.Replace(row[2], ",", "", -1), 64)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, Err{Message: err.Error()})
-		}
-		td.Allowances = []Allowance{{
-			AllowanceType: Donation,
-			Amount:        a,
-		}}
-
-		taxDetails = append(taxDetails, td)
-
 	}
 
 	taxes := []Taxes{}
@@ -143,7 +92,6 @@ func (h *Handler) TaxCSVHandler(c echo.Context) error {
 
 		taxes = append(taxes, tr)
 
-		log.Printf("Tax Detail: %+v\n", td)
 	}
 
 	taxesResponse := TaxesResponse{
