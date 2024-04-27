@@ -23,6 +23,15 @@ type Handler struct {
 	store Storer
 }
 
+type Taxes struct {
+	TotalIncome float64 `json:"totalIncome"`
+	Tax         float64 `json:"tax"`
+}
+
+type TaxesResponse struct {
+	Taxes []Taxes `json:"taxes"`
+}
+
 func New(store Storer) *Handler {
 	return &Handler{store: store}
 }
@@ -113,10 +122,33 @@ func (h *Handler) TaxCSVHandler(c echo.Context) error {
 
 	}
 
+	taxes := []Taxes{}
 	// check
 	for _, td := range taxDetails {
+
+		if err := td.ValidateTaxDetails(); err != nil {
+			return c.JSON(http.StatusBadRequest, Err{Message: err.Error()})
+		}
+
+		t, err := h.store.TaxCalculation(td)
+
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, Err{Message: err.Error()})
+		}
+
+		tr := Taxes{
+			TotalIncome: td.TotalIncome,
+			Tax:         t.Tax,
+		}
+
+		taxes = append(taxes, tr)
+
 		log.Printf("Tax Detail: %+v\n", td)
 	}
 
-	return c.String(http.StatusOK, "File processed successfully")
+	taxesResponse := TaxesResponse{
+		Taxes: taxes,
+	}
+
+	return c.JSON(http.StatusOK, taxesResponse)
 }
