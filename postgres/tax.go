@@ -42,9 +42,5 @@ func (p *Postgres) TaxCalculation(td tax.TaxDetails) (tax.TaxCalculationResponse
 
 	netIncome := td.CalculateNetIncome(ma)
 
-	if netIncome <= 0 {
-		return tax.TaxCalculationResponse{Tax: 0.0}, nil
-	}
-
 	return tax.CalculateTax(netIncome, td.WHT), nil
 }
