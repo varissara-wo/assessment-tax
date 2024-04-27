@@ -1,7 +1,6 @@
 package postgres
 
 import (
-	"github.com/varissara-wo/assessment-tax/admin"
 	"github.com/varissara-wo/assessment-tax/allowance"
 	"github.com/varissara-wo/assessment-tax/tax"
 )
@@ -35,14 +34,6 @@ func (p *Postgres) GetAllowances() (tax.MaxAllowance, error) {
 	}
 
 	return ma, nil
-}
-
-func (p *Postgres) SetPersonalAllowance(a float64) (admin.PersonalAllowance, error) {
-	_, err := p.Db.Exec("UPDATE allowances SET max_amount = $1 WHERE type = 'personal'", a)
-	if err != nil {
-		return admin.PersonalAllowance{}, err
-	}
-	return admin.PersonalAllowance{PersonalDeduction: a}, nil
 }
 
 func (p *Postgres) SetPersonal(a float64) (allowance.Personal, error) {
