@@ -26,13 +26,13 @@ func TestTaxCalculation(t *testing.T) {
 	}{
 		{0.0, 0.0, generateTaxBreakdown(0.0, 0.0, 0.0, 0.0, 0.0)},
 		{150000.0, 0.0, generateTaxBreakdown(0.0, 0.0, 0.0, 0.0, 0.0)},
-		{150001.0, 0.0, generateTaxBreakdown(0.0, 0.0, 0.0, 0.0, 0.0)},
+		{150001.0, 0.1, generateTaxBreakdown(0.0, 0.1, 0.0, 0.0, 0.0)},
 		{500000.0, 35000.0, generateTaxBreakdown(0.0, 35000.0, 0.0, 0.0, 0.0)},
-		{500001.0, 35000.0, generateTaxBreakdown(0.0, 0.0, 35000.0, 0.0, 0.0)},
-		{1000000.0, 110000.0, generateTaxBreakdown(0.0, 0.0, 110000.0, 0.0, 0.0)},
-		{1000001.0, 110000.0, generateTaxBreakdown(0.0, 0.0, 0.0, 110000.0, 0.0)},
-		{2000000.0, 310000.0, generateTaxBreakdown(0.0, 0.0, 0.0, 310000.0, 0.0)},
-		{3000000.0, 660000.0, generateTaxBreakdown(0.0, 0.0, 0.0, 0.0, 660000.0)},
+		{500001.0, 35000.15, generateTaxBreakdown(0.0, 35000.0, 0.15, 0.0, 0.0)},
+		{1000000.0, 110000.0, generateTaxBreakdown(0.0, 35000.0, 75000.0, 0.0, 0.0)},
+		{1000001.0, 110000.2, generateTaxBreakdown(0.0, 35000.0, 75000.0, 0.2, 0.0)},
+		{2000000.0, 310000.0, generateTaxBreakdown(0.0, 35000.0, 75000.0, 200000.0, 0.0)},
+		{3000000.0, 660000.0, generateTaxBreakdown(0.0, 35000.0, 75000.0, 200000.0, 350000.0)},
 	}
 
 	for _, tt := range tests {
