@@ -6,7 +6,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/varissara-wo/assessment-tax/admin"
 	"github.com/varissara-wo/assessment-tax/allowance"
 	"github.com/varissara-wo/assessment-tax/postgres"
 	"github.com/varissara-wo/assessment-tax/tax"
@@ -26,7 +25,6 @@ func main() {
 	e.POST("/tax/calculations", th.TaxHandler)
 	e.POST("tax/calculations/upload-csv", th.TaxCSVHandler)
 
-	ah := admin.New(p)
 	aw := allowance.New(p)
 	a := e.Group("/admin")
 	a.Use(middleware.BasicAuth(func(username, password string, c echo.Context) (bool, error) {
@@ -37,7 +35,7 @@ func main() {
 
 	}))
 
-	a.POST("/personal-deduction", ah.SetPersonalAllowanceHandler)
+	a.POST("/deductions/personal", aw.SetPersonalHandler)
 	a.POST("/deductions/k-receipt", aw.SetKReceiptHandler)
 
 	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))

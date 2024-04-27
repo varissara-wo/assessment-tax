@@ -45,6 +45,14 @@ func (p *Postgres) SetPersonalAllowance(a float64) (admin.PersonalAllowance, err
 	return admin.PersonalAllowance{PersonalDeduction: a}, nil
 }
 
+func (p *Postgres) SetPersonal(a float64) (allowance.Personal, error) {
+	_, err := p.Db.Exec("UPDATE allowances SET max_amount = $1 WHERE type = 'personal'", a)
+	if err != nil {
+		return allowance.Personal{}, err
+	}
+	return allowance.Personal{Personal: a}, nil
+}
+
 func (p *Postgres) SetKReceipt(a float64) (allowance.KReceipt, error) {
 	_, err := p.Db.Exec("UPDATE allowances SET max_amount = $1 WHERE type = 'k-receipt'", a)
 	if err != nil {
