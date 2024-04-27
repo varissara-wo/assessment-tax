@@ -14,11 +14,11 @@ import (
 
 type stub struct {
 	Amount            Amount
-	PersonalDeduction PersonalDeduction
+	PersonalDeduction PersonalAllowance
 	err               error
 }
 
-func (s *stub) SetPersonalDeduction(amount float64) (PersonalDeduction, error) {
+func (s *stub) SetPersonalAllowance(amount float64) (PersonalAllowance, error) {
 	return s.PersonalDeduction, s.err
 }
 
@@ -36,7 +36,7 @@ func TestTaxHandler(t *testing.T) {
 		st := stub{}
 
 		p := New(&st)
-		err := p.PersonalDeductionHandler(c)
+		err := p.SetPersonalAllowanceHandler(c)
 
 		if err != nil {
 			t.Errorf("expected error message but got %v", err)
@@ -65,22 +65,22 @@ func TestTaxHandler(t *testing.T) {
 		c := e.NewContext(req, rec)
 
 		st := stub{
-			PersonalDeduction: PersonalDeduction{
+			PersonalDeduction: PersonalAllowance{
 				PersonalDeduction: 20000.0,
 			},
 		}
 
 		p := New(&st)
-		err := p.PersonalDeductionHandler(c)
+		err := p.SetPersonalAllowanceHandler(c)
 
 		if err != nil {
 			t.Errorf("expected nil but got %v", err)
 		}
 
-		var got PersonalDeduction
+		var got PersonalAllowance
 		json.Unmarshal(rec.Body.Bytes(), &got)
 
-		want := PersonalDeduction{
+		want := PersonalAllowance{
 			PersonalDeduction: 20000.0,
 		}
 
@@ -108,7 +108,7 @@ func TestTaxHandler(t *testing.T) {
 		}
 
 		p := New(&st)
-		err := p.PersonalDeductionHandler(c)
+		err := p.SetPersonalAllowanceHandler(c)
 
 		if err != nil {
 			t.Errorf("expected nil but got %v", err)

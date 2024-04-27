@@ -7,7 +7,7 @@ const (
 	ErrInvalidPersonalLessAmount    = "amount must be less than 100000.0"
 )
 
-func (a Amount) ValidatePersonalDeduction() error {
+func (a Amount) ValidatePersonalAllowance() error {
 	if a.Amount < 10000 {
 		return errors.New(ErrInvalidPersonalGreaterAmount)
 	}

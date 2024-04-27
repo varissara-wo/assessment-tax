@@ -35,7 +35,7 @@ func main() {
 
 	}))
 
-	a.POST("/personal-deduction", ah.PersonalDeductionHandler)
+	a.POST("/personal-deduction", ah.SetPersonalAllowanceHandler)
 
 	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
 }
