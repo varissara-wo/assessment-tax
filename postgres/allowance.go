@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"github.com/varissara-wo/assessment-tax/admin"
+	"github.com/varissara-wo/assessment-tax/allowance"
 	"github.com/varissara-wo/assessment-tax/tax"
 )
 
@@ -42,4 +43,12 @@ func (p *Postgres) SetPersonalAllowance(a float64) (admin.PersonalAllowance, err
 		return admin.PersonalAllowance{}, err
 	}
 	return admin.PersonalAllowance{PersonalDeduction: a}, nil
+}
+
+func (p *Postgres) SetKReceipt(a float64) (allowance.KReceipt, error) {
+	_, err := p.Db.Exec("UPDATE allowances SET max_amount = $1 WHERE type = 'k-receipt'", a)
+	if err != nil {
+		return allowance.KReceipt{}, err
+	}
+	return allowance.KReceipt{KReceipt: a}, nil
 }
