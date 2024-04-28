@@ -13,9 +13,10 @@ type TaxBreakdown struct {
 	Tax   float64 `json:"tax"`
 }
 
-type TaxCalculationResponse struct {
-	Tax      float64        `json:"tax"`
-	TaxLevel []TaxBreakdown `json:"taxLevel"`
+type TaxResponse struct {
+	Tax       float64        `json:"tax"`
+	TaxRefund float64        `json:"taxRefund"`
+	TaxLevel  []TaxBreakdown `json:"taxLevel"`
 }
 
 const (

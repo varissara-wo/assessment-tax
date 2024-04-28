@@ -54,6 +54,18 @@ func TestTaxCalculation(t *testing.T) {
 
 		})
 	}
+
+	t.Run("should return tax refund 85000", func(t *testing.T) {
+		income := 300000.0
+		wht := 100000.0
+
+		got := CalculateTax(income, wht)
+		want := 85000.0
+
+		if got.TaxRefund != want {
+			t.Errorf("got %v want %v", got.TaxRefund, want)
+		}
+	})
 }
 
 var mockMaxAllowance = allowance.MaxAllowance{

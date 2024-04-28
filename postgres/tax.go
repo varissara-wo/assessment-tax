@@ -7,14 +7,14 @@ import (
 	"github.com/varissara-wo/assessment-tax/tax"
 )
 
-func (p *Postgres) TaxCalculation(td tax.TaxDetails) (tax.TaxCalculationResponse, error) {
+func (p *Postgres) TaxCalculation(td tax.TaxDetails) (tax.TaxResponse, error) {
 
 	var rows *sql.Rows
 
 	rows, err := p.Db.Query("SELECT * FROM allowances")
 
 	if err != nil {
-		return tax.TaxCalculationResponse{}, err
+		return tax.TaxResponse{}, err
 	}
 
 	defer rows.Close()
@@ -28,7 +28,7 @@ func (p *Postgres) TaxCalculation(td tax.TaxDetails) (tax.TaxCalculationResponse
 		err := rows.Scan(&id, &t, &amount)
 
 		if err != nil {
-			return tax.TaxCalculationResponse{}, err
+			return tax.TaxResponse{}, err
 		}
 
 		switch t {

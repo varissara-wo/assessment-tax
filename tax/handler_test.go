@@ -15,11 +15,11 @@ import (
 
 type stub struct {
 	TaxDetails TaxDetails
-	Tax        TaxCalculationResponse
+	Tax        TaxResponse
 	err        error
 }
 
-func (s *stub) TaxCalculation(td TaxDetails) (TaxCalculationResponse, error) {
+func (s *stub) TaxCalculation(td TaxDetails) (TaxResponse, error) {
 	return s.Tax, s.err
 }
 
@@ -125,7 +125,7 @@ func TestTaxHandler(t *testing.T) {
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
 
-		want := TaxCalculationResponse{Tax: 29000.0, TaxLevel: []TaxBreakdown{}}
+		want := TaxResponse{Tax: 29000.0, TaxLevel: []TaxBreakdown{}}
 
 		st := stub{
 			TaxDetails: mockTaxDetails,
@@ -139,7 +139,7 @@ func TestTaxHandler(t *testing.T) {
 			t.Errorf("got some error %v", err)
 		}
 
-		var got TaxCalculationResponse
+		var got TaxResponse
 		json.Unmarshal(rec.Body.Bytes(), &got)
 
 		if got.Tax != want.Tax || !reflect.DeepEqual(got.TaxLevel, want.TaxLevel) {

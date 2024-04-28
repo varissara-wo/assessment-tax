@@ -12,7 +12,7 @@ type Err struct {
 }
 
 type Storer interface {
-	TaxCalculation(TaxDetails) (TaxCalculationResponse, error)
+	TaxCalculation(TaxDetails) (TaxResponse, error)
 }
 
 type Handler struct {
