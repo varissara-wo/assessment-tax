@@ -43,7 +43,7 @@ func main() {
 	a.POST("/deductions/k-receipt", aw.SetKReceiptHandler)
 
 	go func() {
-		if err := e.Start(":" + os.Getenv("ADMIN_PORT")); err != nil && err != http.ErrServerClosed {
+		if err := e.Start(":" + os.Getenv("PORT")); err != nil && err != http.ErrServerClosed {
 			e.Logger.Info("start error, shutting down the server")
 		}
 	}()
