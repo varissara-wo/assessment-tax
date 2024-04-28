@@ -1,12 +1,11 @@
 package postgres
 
 import (
-	"github.com/varissara-wo/assessment-tax/admin"
-	"github.com/varissara-wo/assessment-tax/tax"
+	"github.com/varissara-wo/assessment-tax/allowance"
 )
 
-func (p *Postgres) GetAllowances() (tax.MaxAllowance, error) {
-	var ma tax.MaxAllowance
+func (p *Postgres) GetAllowances() (allowance.MaxAllowance, error) {
+	var ma allowance.MaxAllowance
 
 	rows, err := p.Db.Query("SELECT * FROM allowances")
 	if err != nil {
@@ -15,7 +14,7 @@ func (p *Postgres) GetAllowances() (tax.MaxAllowance, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var t tax.AllowanceType
+		var t allowance.AllowanceType
 		var amount float64
 		var id int
 		err := rows.Scan(&id, &t, &amount)
@@ -24,11 +23,11 @@ func (p *Postgres) GetAllowances() (tax.MaxAllowance, error) {
 		}
 
 		switch t {
-		case tax.Donation:
+		case allowance.Donation:
 			ma.Donation = amount
-		case tax.KReceipt:
+		case allowance.KReceipt:
 			ma.KReceipt = amount
-		case tax.Personal:
+		case allowance.Personal:
 			ma.Personal = amount
 		}
 	}
@@ -36,10 +35,18 @@ func (p *Postgres) GetAllowances() (tax.MaxAllowance, error) {
 	return ma, nil
 }
 
-func (p *Postgres) SetPersonalAllowance(a float64) (admin.PersonalAllowance, error) {
+func (p *Postgres) SetPersonal(a float64) (allowance.PersonalDeduction, error) {
 	_, err := p.Db.Exec("UPDATE allowances SET max_amount = $1 WHERE type = 'personal'", a)
 	if err != nil {
-		return admin.PersonalAllowance{}, err
+		return allowance.PersonalDeduction{}, err
 	}
-	return admin.PersonalAllowance{PersonalDeduction: a}, nil
+	return allowance.PersonalDeduction{Personal: a}, nil
+}
+
+func (p *Postgres) SetKReceipt(a float64) (allowance.KReceiptDeduction, error) {
+	_, err := p.Db.Exec("UPDATE allowances SET max_amount = $1 WHERE type = 'k-receipt'", a)
+	if err != nil {
+		return allowance.KReceiptDeduction{}, err
+	}
+	return allowance.KReceiptDeduction{KReceipt: a}, nil
 }

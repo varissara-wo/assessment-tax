@@ -6,6 +6,13 @@ import (
 	"io"
 	"strconv"
 	"strings"
+
+	"github.com/varissara-wo/assessment-tax/allowance"
+)
+
+const (
+	ErrInvalidHeaderCSVData  = "invalid CSV header, expected totalIncome, wht, donation"
+	ErrorInvalidEmptyCSVData = "invalid CSV data value cannot be empty"
 )
 
 func readCSV(reader *csv.Reader) ([]TaxDetails, error) {
@@ -15,7 +22,7 @@ func readCSV(reader *csv.Reader) ([]TaxDetails, error) {
 	}
 
 	if row[0] != "totalIncome" || row[1] != "wht" || row[2] != "donation" {
-		return nil, errors.New("invalid CSV header, expected totalIncome, wht, donation")
+		return nil, errors.New(ErrInvalidHeaderCSVData)
 	}
 
 	tds := []TaxDetails{}
@@ -31,7 +38,7 @@ func readCSV(reader *csv.Reader) ([]TaxDetails, error) {
 		td := TaxDetails{}
 
 		if row[0] == "" || row[1] == "" || row[2] == "" {
-			return nil, errors.New("invalid CSV data value cannot be empty")
+			return nil, errors.New(ErrorInvalidEmptyCSVData)
 		}
 
 		for i, r := range row {
@@ -46,8 +53,8 @@ func readCSV(reader *csv.Reader) ([]TaxDetails, error) {
 			case 1:
 				td.WHT = v
 			case 2:
-				td.Allowances = []Allowance{{
-					AllowanceType: Donation,
+				td.Allowances = []allowance.Allowance{{
+					AllowanceType: allowance.Donation,
 					Amount:        v,
 				}}
 			}

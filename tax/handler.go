@@ -12,7 +12,8 @@ type Err struct {
 }
 
 type Storer interface {
-	TaxCalculation(TaxDetails) (TaxCalculationResponse, error)
+	TaxCalculation(TaxDetails) (TaxResponse, error)
+	TaxesCalculation([]TaxDetails) ([]Taxes, error)
 }
 
 type Handler struct {
@@ -22,6 +23,7 @@ type Handler struct {
 type Taxes struct {
 	TotalIncome float64 `json:"totalIncome"`
 	Tax         float64 `json:"tax"`
+	TaxRefund   float64 `json:"taxRefund"`
 }
 
 type TaxesResponse struct {
@@ -71,27 +73,10 @@ func (h *Handler) TaxCSVHandler(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, Err{Message: err.Error()})
 	}
 
-	taxes := []Taxes{}
-	// check
-	for _, td := range taxDetails {
+	taxes, err := h.store.TaxesCalculation(taxDetails)
 
-		if err := td.ValidateTaxDetails(); err != nil {
-			return c.JSON(http.StatusBadRequest, Err{Message: err.Error()})
-		}
-
-		t, err := h.store.TaxCalculation(td)
-
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, Err{Message: err.Error()})
-		}
-
-		tr := Taxes{
-			TotalIncome: td.TotalIncome,
-			Tax:         t.Tax,
-		}
-
-		taxes = append(taxes, tr)
-
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, Err{Message: err.Error()})
 	}
 
 	taxesResponse := TaxesResponse{
