@@ -5,6 +5,8 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/varissara-wo/assessment-tax/allowance"
 )
 
 func TestReadCSV(t *testing.T) {
@@ -25,9 +27,9 @@ func TestReadCSV(t *testing.T) {
 			{
 				TotalIncome: 1000.0,
 				WHT:         200.0,
-				Allowances: []Allowance{
+				Allowances: []allowance.Allowance{
 					{
-						AllowanceType: Donation,
+						AllowanceType: allowance.Donation,
 						Amount:        300.0,
 					},
 				},
@@ -35,9 +37,9 @@ func TestReadCSV(t *testing.T) {
 			{
 				TotalIncome: 4000.0,
 				WHT:         500.0,
-				Allowances: []Allowance{
+				Allowances: []allowance.Allowance{
 					{
-						AllowanceType: Donation,
+						AllowanceType: allowance.Donation,
 						Amount:        600.0,
 					},
 				},

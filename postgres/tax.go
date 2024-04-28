@@ -3,6 +3,7 @@ package postgres
 import (
 	"database/sql"
 
+	"github.com/varissara-wo/assessment-tax/allowance"
 	"github.com/varissara-wo/assessment-tax/tax"
 )
 
@@ -18,10 +19,10 @@ func (p *Postgres) TaxCalculation(td tax.TaxDetails) (tax.TaxCalculationResponse
 
 	defer rows.Close()
 
-	var ma tax.MaxAllowance
+	var ma allowance.MaxAllowance
 
 	for rows.Next() {
-		var t tax.AllowanceType
+		var t allowance.AllowanceType
 		var amount float64
 		var id int
 		err := rows.Scan(&id, &t, &amount)
@@ -31,11 +32,11 @@ func (p *Postgres) TaxCalculation(td tax.TaxDetails) (tax.TaxCalculationResponse
 		}
 
 		switch t {
-		case tax.Donation:
+		case allowance.Donation:
 			ma.Donation = amount
-		case tax.KReceipt:
+		case allowance.KReceipt:
 			ma.KReceipt = amount
-		case tax.Personal:
+		case allowance.Personal:
 			ma.Personal = amount
 		}
 	}

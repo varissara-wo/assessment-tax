@@ -7,8 +7,8 @@ import (
 )
 
 type Storer interface {
-	SetPersonal(amount float64) (Personal, error)
-	SetKReceipt(amount float64) (KReceipt, error)
+	SetPersonal(amount float64) (PersonalDeduction, error)
+	SetKReceipt(amount float64) (KReceiptDeduction, error)
 }
 
 type Handler struct {

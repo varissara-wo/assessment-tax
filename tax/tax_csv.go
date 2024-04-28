@@ -6,6 +6,8 @@ import (
 	"io"
 	"strconv"
 	"strings"
+
+	"github.com/varissara-wo/assessment-tax/allowance"
 )
 
 const (
@@ -51,8 +53,8 @@ func readCSV(reader *csv.Reader) ([]TaxDetails, error) {
 			case 1:
 				td.WHT = v
 			case 2:
-				td.Allowances = []Allowance{{
-					AllowanceType: Donation,
+				td.Allowances = []allowance.Allowance{{
+					AllowanceType: allowance.Donation,
 					Amount:        v,
 				}}
 			}

@@ -2,6 +2,8 @@ package tax
 
 import (
 	"math"
+
+	"github.com/varissara-wo/assessment-tax/allowance"
 )
 
 type TaxBracket struct {
@@ -60,47 +62,6 @@ func CalculateTax(income float64, wht float64) TaxCalculationResponse {
 	return taxCalculationResponse
 }
 
-type AllowanceAmount struct {
-	Donation float64
-	KReceipt float64
-	Personal float64
-}
-
-type MaxAllowance struct {
-	Donation float64
-	KReceipt float64
-	Personal float64
-}
-
-func calculateAllowances(allowances []Allowance, ma MaxAllowance) float64 {
-	aa := AllowanceAmount{
-		Donation: 0.0,
-		KReceipt: 0.0,
-		Personal: 0.0,
-	}
-
-	aa.Personal = ma.Personal
-
-	for _, a := range allowances {
-		switch a.AllowanceType {
-		case "donation":
-			if aa.Donation+a.Amount <= ma.Donation {
-				aa.Donation += a.Amount
-			} else {
-				aa.Donation = ma.Donation
-			}
-		case KReceipt:
-			if aa.KReceipt+a.Amount <= ma.KReceipt {
-				aa.KReceipt += a.Amount
-			} else {
-				aa.KReceipt = ma.KReceipt
-			}
-		}
-	}
-
-	return aa.Donation + aa.KReceipt + aa.Personal
-}
-
-func (td TaxDetails) CalculateNetIncome(ma MaxAllowance) float64 {
-	return td.TotalIncome - calculateAllowances(td.Allowances, ma)
+func (td TaxDetails) CalculateNetIncome(ma allowance.MaxAllowance) float64 {
+	return td.TotalIncome - allowance.CalculateAllowances(td.Allowances, ma)
 }

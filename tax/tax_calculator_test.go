@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
+
+	"github.com/varissara-wo/assessment-tax/allowance"
 )
 
 func generateTaxBreakdown(taxValues ...float64) []TaxBreakdown {
@@ -54,33 +56,10 @@ func TestTaxCalculation(t *testing.T) {
 	}
 }
 
-var mockMaxAllowance = MaxAllowance{
+var mockMaxAllowance = allowance.MaxAllowance{
 	Donation: 100000.0,
 	KReceipt: 50000.0,
 	Personal: 60000.0,
-}
-
-func TestAllowancesCalculation(t *testing.T) {
-	t.Run("should return 60000", func(t *testing.T) {
-		want := 180000.0
-
-		mockAllowances := []Allowance{
-			{
-				AllowanceType: "k-receipt",
-				Amount:        20000.0,
-			},
-			{
-				AllowanceType: "donation",
-				Amount:        105000.0,
-			},
-		}
-
-		got := calculateAllowances(mockAllowances, mockMaxAllowance)
-
-		if got != want {
-			t.Errorf("got %v want %v", got, want)
-		}
-	})
 }
 
 func TestNetIncomeCalculation(t *testing.T) {
@@ -90,7 +69,7 @@ func TestNetIncomeCalculation(t *testing.T) {
 		mockTaxDetails := TaxDetails{
 			TotalIncome: 1000000.0,
 			WHT:         2000.0,
-			Allowances: []Allowance{
+			Allowances: []allowance.Allowance{
 				{
 					AllowanceType: "k-receipt",
 					Amount:        200000.0,

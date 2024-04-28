@@ -3,6 +3,8 @@ package tax
 import (
 	"errors"
 	"testing"
+
+	"github.com/varissara-wo/assessment-tax/allowance"
 )
 
 func TestValidateTaxDetails(t *testing.T) {
@@ -11,7 +13,7 @@ func TestValidateTaxDetails(t *testing.T) {
 		mockTaxDetails := TaxDetails{
 			TotalIncome: 500000.0,
 			WHT:         0.0,
-			Allowances: []Allowance{
+			Allowances: []allowance.Allowance{
 				{
 					AllowanceType: "donation",
 					Amount:        0.0,
@@ -37,7 +39,7 @@ func TestValidateTaxDetails(t *testing.T) {
 			taxDetails: TaxDetails{
 				TotalIncome: -1.0,
 				WHT:         0.0,
-				Allowances: []Allowance{
+				Allowances: []allowance.Allowance{
 					{
 						AllowanceType: "donation",
 						Amount:        0.0,
@@ -51,7 +53,7 @@ func TestValidateTaxDetails(t *testing.T) {
 			taxDetails: TaxDetails{
 				TotalIncome: 500000.0,
 				WHT:         -1.0,
-				Allowances: []Allowance{
+				Allowances: []allowance.Allowance{
 					{
 						AllowanceType: "donation",
 						Amount:        0.0,
@@ -65,7 +67,7 @@ func TestValidateTaxDetails(t *testing.T) {
 			taxDetails: TaxDetails{
 				TotalIncome: 500000.0,
 				WHT:         500001.0,
-				Allowances: []Allowance{
+				Allowances: []allowance.Allowance{
 					{
 						AllowanceType: "donation",
 						Amount:        0.0,
@@ -79,7 +81,7 @@ func TestValidateTaxDetails(t *testing.T) {
 			taxDetails: TaxDetails{
 				TotalIncome: 500000.0,
 				WHT:         0.0,
-				Allowances: []Allowance{
+				Allowances: []allowance.Allowance{
 					{
 						AllowanceType: "invalid",
 						Amount:        0.0,
@@ -93,7 +95,7 @@ func TestValidateTaxDetails(t *testing.T) {
 			taxDetails: TaxDetails{
 				TotalIncome: 500000.0,
 				WHT:         0.0,
-				Allowances: []Allowance{
+				Allowances: []allowance.Allowance{
 					{
 						AllowanceType: "donation",
 						Amount:        -1.0,

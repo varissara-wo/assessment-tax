@@ -1,24 +1,11 @@
 package tax
 
-type AllowanceType string
-
-const (
-	Donation AllowanceType = "donation"
-	KReceipt AllowanceType = "k-receipt"
-	Personal AllowanceType = "personal"
-)
-
-var validAllowanceTypes = []AllowanceType{Donation, KReceipt}
-
-type Allowance struct {
-	AllowanceType AllowanceType
-	Amount        float64
-}
+import "github.com/varissara-wo/assessment-tax/allowance"
 
 type TaxDetails struct {
 	TotalIncome float64
 	WHT         float64
-	Allowances  []Allowance
+	Allowances  []allowance.Allowance
 }
 
 type TaxBreakdown struct {

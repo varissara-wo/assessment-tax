@@ -14,16 +14,16 @@ import (
 
 type stub struct {
 	Amount   Amount
-	Personal Personal
-	KReceipt KReceipt
+	Personal PersonalDeduction
+	KReceipt KReceiptDeduction
 	err      error
 }
 
-func (s *stub) SetPersonal(amount float64) (Personal, error) {
+func (s *stub) SetPersonal(amount float64) (PersonalDeduction, error) {
 	return s.Personal, s.err
 }
 
-func (s *stub) SetKReceipt(amount float64) (KReceipt, error) {
+func (s *stub) SetKReceipt(amount float64) (KReceiptDeduction, error) {
 	return s.KReceipt, s.err
 }
 
@@ -102,7 +102,7 @@ func TestSetPersonalHandler(t *testing.T) {
 		c := e.NewContext(req, rec)
 
 		st := stub{
-			Personal: Personal{
+			Personal: PersonalDeduction{
 				Personal: 20000.0,
 			},
 		}
@@ -114,10 +114,10 @@ func TestSetPersonalHandler(t *testing.T) {
 			t.Errorf("expected nil but got %v", err)
 		}
 
-		var got Personal
+		var got PersonalDeduction
 		json.Unmarshal(rec.Body.Bytes(), &got)
 
-		want := Personal{
+		want := PersonalDeduction{
 			Personal: 20000.0,
 		}
 
@@ -275,7 +275,7 @@ func TestSetKReceiptHandler(t *testing.T) {
 		c := e.NewContext(req, rec)
 
 		st := stub{
-			KReceipt: KReceipt{
+			KReceipt: KReceiptDeduction{
 				KReceipt: 20000.0,
 			},
 		}
@@ -287,10 +287,10 @@ func TestSetKReceiptHandler(t *testing.T) {
 			t.Errorf("expected nil but got %v", err)
 		}
 
-		var got KReceipt
+		var got KReceiptDeduction
 		json.Unmarshal(rec.Body.Bytes(), &got)
 
-		want := KReceipt{
+		want := KReceiptDeduction{
 			KReceipt: 20000.0,
 		}
 

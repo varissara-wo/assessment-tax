@@ -1,6 +1,10 @@
 package tax
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/varissara-wo/assessment-tax/allowance"
+)
 
 func (td *TaxDetails) ValidateTaxDetails() error {
 	if err := validateTotalIncome(td.TotalIncome); err != nil {
@@ -34,7 +38,7 @@ func validateWHT(wht, totalIncome float64) error {
 	return nil
 }
 
-func validateAllowance(a Allowance) error {
+func validateAllowance(a allowance.Allowance) error {
 	if err := validateAllowanceType(a); err != nil {
 		return err
 	}
@@ -46,8 +50,8 @@ func validateAllowance(a Allowance) error {
 	return nil
 }
 
-func validateAllowanceType(a Allowance) error {
-	for _, validType := range validAllowanceTypes {
+func validateAllowanceType(a allowance.Allowance) error {
+	for _, validType := range allowance.ValidAllowanceTypes {
 		if a.AllowanceType == validType {
 			return nil
 		}

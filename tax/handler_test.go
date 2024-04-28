@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/labstack/echo/v4"
+	"github.com/varissara-wo/assessment-tax/allowance"
 )
 
 type stub struct {
@@ -28,7 +29,7 @@ func TestTaxHandler(t *testing.T) {
 		mockTaxDetails := TaxDetails{
 			TotalIncome: -1.0,
 			WHT:         0.0,
-			Allowances: []Allowance{
+			Allowances: []allowance.Allowance{
 				{
 					AllowanceType: "donation",
 					Amount:        0.0,
@@ -69,7 +70,7 @@ func TestTaxHandler(t *testing.T) {
 		mockTaxDetails := TaxDetails{
 			TotalIncome: 10000.0,
 			WHT:         0.0,
-			Allowances: []Allowance{
+			Allowances: []allowance.Allowance{
 				{
 					AllowanceType: "donation",
 					Amount:        0.0,
@@ -109,7 +110,7 @@ func TestTaxHandler(t *testing.T) {
 		mockTaxDetails := TaxDetails{
 			TotalIncome: 500000.0,
 			WHT:         0.0,
-			Allowances: []Allowance{
+			Allowances: []allowance.Allowance{
 				{
 					AllowanceType: "donation",
 					Amount:        0.0,
