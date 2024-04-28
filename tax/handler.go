@@ -72,7 +72,7 @@ func (h *Handler) TaxCSVHandler(c echo.Context) error {
 	}
 
 	taxes := []Taxes{}
-	// check
+
 	for _, td := range taxDetails {
 
 		if err := td.ValidateTaxDetails(); err != nil {
