@@ -88,7 +88,7 @@ func TestValidateTaxDetails(t *testing.T) {
 					},
 				},
 			},
-			expectedError: errors.New(ErrInvalidAllowance),
+			expectedError: errors.New(allowance.ErrInvalidAllowance),
 		},
 		{
 			name: "should return an error if allowance amount is less than 0",
@@ -102,7 +102,7 @@ func TestValidateTaxDetails(t *testing.T) {
 					},
 				},
 			},
-			expectedError: errors.New(ErrInvalidAllowanceAmount),
+			expectedError: errors.New(allowance.ErrInvalidAllowanceAmount),
 		},
 	}
 

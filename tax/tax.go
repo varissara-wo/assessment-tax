@@ -20,8 +20,6 @@ type TaxResponse struct {
 }
 
 const (
-	ErrInvalidTotalIncome     = "total income must be greater than or equals 0"
-	ErrInvalidWHT             = "wht must be greater than or equal to 0 and less than total income"
-	ErrInvalidAllowance       = "allowances must be donation and k-receipt only"
-	ErrInvalidAllowanceAmount = "allowance amount must be greater than or equal to 0"
+	ErrInvalidTotalIncome = "total income must be greater than or equals 0"
+	ErrInvalidWHT         = "wht must be greater than or equal to 0 and less than total income"
 )

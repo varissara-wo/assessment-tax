@@ -16,7 +16,7 @@ func (td *TaxDetails) ValidateTaxDetails() error {
 	}
 
 	for _, a := range td.Allowances {
-		if err := validateAllowance(a); err != nil {
+		if err := allowance.ValidateAllowance(a); err != nil {
 			return err
 		}
 	}
@@ -36,25 +36,4 @@ func validateWHT(wht, totalIncome float64) error {
 		return errors.New(ErrInvalidWHT)
 	}
 	return nil
-}
-
-func validateAllowance(a allowance.Allowance) error {
-	if err := validateAllowanceType(a); err != nil {
-		return err
-	}
-
-	if a.Amount < 0 {
-		return errors.New(ErrInvalidAllowanceAmount)
-	}
-
-	return nil
-}
-
-func validateAllowanceType(a allowance.Allowance) error {
-	for _, validType := range allowance.ValidAllowanceTypes {
-		if a.AllowanceType == validType {
-			return nil
-		}
-	}
-	return errors.New(ErrInvalidAllowance)
 }
