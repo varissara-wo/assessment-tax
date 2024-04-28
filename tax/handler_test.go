@@ -23,6 +23,10 @@ func (s *stub) TaxCalculation(td TaxDetails) (TaxResponse, error) {
 	return s.Tax, s.err
 }
 
+func (s *stub) TaxesCalculation(tds []TaxDetails) ([]Taxes, error) {
+	return []Taxes{}, nil
+}
+
 func TestTaxHandler(t *testing.T) {
 	t.Run("should return 400 and an error if provide bad request payload", func(t *testing.T) {
 

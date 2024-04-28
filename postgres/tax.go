@@ -1,47 +1,49 @@
 package postgres
 
 import (
-	"database/sql"
-
-	"github.com/varissara-wo/assessment-tax/allowance"
 	"github.com/varissara-wo/assessment-tax/tax"
 )
 
 func (p *Postgres) TaxCalculation(td tax.TaxDetails) (tax.TaxResponse, error) {
 
-	var rows *sql.Rows
-
-	rows, err := p.Db.Query("SELECT * FROM allowances")
-
+	ma, err := p.GetAllowances()
 	if err != nil {
 		return tax.TaxResponse{}, err
-	}
-
-	defer rows.Close()
-
-	var ma allowance.MaxAllowance
-
-	for rows.Next() {
-		var t allowance.AllowanceType
-		var amount float64
-		var id int
-		err := rows.Scan(&id, &t, &amount)
-
-		if err != nil {
-			return tax.TaxResponse{}, err
-		}
-
-		switch t {
-		case allowance.Donation:
-			ma.Donation = amount
-		case allowance.KReceipt:
-			ma.KReceipt = amount
-		case allowance.Personal:
-			ma.Personal = amount
-		}
 	}
 
 	netIncome := td.CalculateNetIncome(ma)
 
 	return tax.CalculateTax(netIncome, td.WHT), nil
+}
+
+func (p *Postgres) TaxesCalculation(tds []tax.TaxDetails) ([]tax.Taxes, error) {
+
+	ma, err := p.GetAllowances()
+	if err != nil {
+		return []tax.Taxes{}, err
+	}
+
+	taxes := []tax.Taxes{}
+
+	for _, td := range tds {
+
+		if err := td.ValidateTaxDetails(); err != nil {
+			return []tax.Taxes{}, err
+		}
+
+		netIncome := td.CalculateNetIncome(ma)
+
+		result := tax.CalculateTax(netIncome, td.WHT)
+
+		tr := tax.Taxes{
+			TotalIncome: td.TotalIncome,
+			Tax:         result.Tax,
+			TaxRefund:   result.TaxRefund,
+		}
+
+		taxes = append(taxes, tr)
+
+	}
+
+	return taxes, nil
 }
