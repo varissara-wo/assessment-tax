@@ -1,8 +1,12 @@
 package main
 
 import (
+	"context"
+	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -23,7 +27,7 @@ func main() {
 		return c.String(http.StatusOK, "Hello, Go Bootcamp!")
 	})
 	e.POST("/tax/calculations", th.TaxHandler)
-	e.POST("tax/calculations/upload-csv", th.TaxCSVHandler)
+	e.POST("/tax/calculations/upload-csv", th.TaxCSVHandler)
 
 	aw := allowance.New(p)
 	a := e.Group("/admin")
@@ -38,5 +42,19 @@ func main() {
 	a.POST("/deductions/personal", aw.SetPersonalHandler)
 	a.POST("/deductions/k-receipt", aw.SetKReceiptHandler)
 
-	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
+	go func() {
+		if err := e.Start(":" + os.Getenv("ADMIN_PORT")); err != nil && err != http.ErrServerClosed {
+			e.Logger.Info("start error, shutting down the server")
+		}
+	}()
+
+	shutdown := make(chan os.Signal, 1)
+	signal.Notify(shutdown, os.Interrupt)
+	<-shutdown
+	log.Println("shutting down the server")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := e.Shutdown(ctx); err != nil {
+		e.Logger.Fatal(err)
+	}
 }
