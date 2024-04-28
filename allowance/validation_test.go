@@ -74,3 +74,50 @@ func TestValidateKreceiptAmount(t *testing.T) {
 	})
 
 }
+
+func TestValidateAllowanceType(t *testing.T) {
+	t.Run("should return error if allowance type is invalid", func(t *testing.T) {
+		a := Allowance{AllowanceType: "invalid_type"}
+
+		want := errors.New(ErrInvalidAllowance)
+		got := validateAllowanceType(a)
+
+		if got.Error() != want.Error() {
+			t.Errorf("expected %v but got %v", want, got)
+		}
+	})
+
+	t.Run("should return nil if allowance type is valid", func(t *testing.T) {
+		a := Allowance{AllowanceType: Donation}
+
+		got := validateAllowanceType(a)
+
+		if got != nil {
+			t.Errorf("expected nil but got %v", got)
+		}
+	})
+
+}
+
+func TestValidateAllowanceAmount(t *testing.T) {
+	t.Run("should return error if allowance amount is less than 0", func(t *testing.T) {
+		a := Allowance{AllowanceType: Donation, Amount: -1.0}
+
+		want := errors.New(ErrInvalidAllowanceAmount)
+		got := ValidateAllowance(a)
+
+		if got.Error() != want.Error() {
+			t.Errorf("expected %v but got %v", want, got)
+		}
+	})
+
+	t.Run("should return nil if allowance amount is valid", func(t *testing.T) {
+		a := Allowance{AllowanceType: Donation, Amount: 20000.0}
+
+		got := ValidateAllowance(a)
+
+		if got != nil {
+			t.Errorf("expected nil but got %v", got)
+		}
+	})
+}
